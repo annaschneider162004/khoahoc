@@ -1,6 +1,8 @@
 <?php
 declare(strict_types=1);
 
+require_once __DIR__ . '/../config/session.php';
+
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
@@ -396,7 +398,7 @@ function generate_certificate_pdf(string $studentName, string $courseName, strin
     $pdf->Cell(0, 15, $studentName, 0, 1, 'C');
     $pdf->SetFont('Helvetica', '', 14);
     $pdf->SetTextColor(60, 60, 60);
-    $pdf->MultiCell(0, 10, 'Đã hoàn thành xuất sắc khóa học ' . $courseName . ' tại nền tảng Music Of Everyone với tinh thần học tập bền bỉ và niềm đam mê âm nhạc.', 0, 'C');
+    $pdf->MultiCell(0, 10, 'Đã hoàn thành xuất sắc khóa học ' . $courseName . ' tại nền tảng Music Of Everyone với tinh thần học tập bền bỉ và niềm đam mê âm nhạc chân chính.');
     $pdf->Ln(8);
     $pdf->Cell(0, 10, 'Ngày cấp: ' . $issuedDate . '   |   Mã chứng nhận: ' . $certificateCode, 0, 1, 'C');
     $pdf->Ln(10);

@@ -31,13 +31,41 @@ function is_post(): bool
     return strtoupper($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'POST';
 }
 
+/**
+ * CSRF token dựa trên cookie (double-submit cookie pattern).
+ *
+ * Không phụ thuộc vào PHP session được lưu hay không - một số gói hosting
+ * (do open_basedir hoặc quyền hệ thống bị giới hạn) không lưu được session
+ * giữa các request, khiến cơ chế CSRF dựa vào $_SESSION luôn báo hết hạn.
+ * Bằng cách lưu token vào cookie riêng (không phải cookie session), token
+ * sẽ tồn tại ổn định giữa các request bất kể cấu hình session của host.
+ */
 function csrf_token(): string
 {
-    if (empty($_SESSION['csrf_token'])) {
-        $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+    if (!empty($_COOKIE['csrf_token']) && is_string($_COOKIE['csrf_token']) && strlen($_COOKIE['csrf_token']) === 64) {
+        return $_COOKIE['csrf_token'];
     }
 
-    return $_SESSION['csrf_token'];
+    $token = bin2hex(random_bytes(32));
+
+    $isHttps = (
+        (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
+        || (($_SERVER['SERVER_PORT'] ?? '') === '443')
+        || (($_SERVER['HTTP_X_FORWARDED_PROTO'] ?? '') === 'https')
+    );
+
+    setcookie('csrf_token', $token, [
+        'expires' => time() + 60 * 60 * 4,
+        'path' => '/',
+        'domain' => '',
+        'secure' => $isHttps,
+        'httponly' => false,
+        'samesite' => 'Lax',
+    ]);
+
+    $_COOKIE['csrf_token'] = $token;
+
+    return $token;
 }
 
 function csrf_field(): string
@@ -51,8 +79,10 @@ function verify_csrf_or_fail(): void
         return;
     }
 
-    $token = (string) ($_POST['csrf_token'] ?? '');
-    if ($token === '' || !hash_equals(csrf_token(), $token)) {
+    $formToken = (string) ($_POST['csrf_token'] ?? '');
+    $cookieToken = (string) ($_COOKIE['csrf_token'] ?? '');
+
+    if ($formToken === '' || $cookieToken === '' || !hash_equals($cookieToken, $formToken)) {
         http_response_code(419);
         exit('Phiên làm việc đã hết hạn hoặc yêu cầu không hợp lệ. Vui lòng tải lại trang và thử lại.');
     }

@@ -1,0 +1,109 @@
+body {
+    font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+.music-gradient {
+    background: linear-gradient(135deg, #6d28d9 0%, #7c3aed 55%, #c4b5fd 100%);
+}
+
+.sidebar-link {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    border-radius: 1rem;
+    padding: 0.85rem 1rem;
+    color: rgba(255, 255, 255, 0.8);
+    transition: all 0.25s ease;
+}
+
+.sidebar-link:hover,
+.sidebar-link.active {
+    background: rgba(255, 255, 255, 0.12);
+    color: #fff;
+    transform: translateX(3px);
+}
+
+.glass-card {
+    background: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(14px);
+}
+
+.note-float::before,
+.note-float::after {
+    position: absolute;
+    color: rgba(255, 255, 255, 0.22);
+    font-size: 5rem;
+    animation: floatNote 8s ease-in-out infinite;
+    pointer-events: none;
+}
+
+.note-float::before {
+    content: '♫';
+    top: 10%;
+    right: 14%;
+}
+
+.note-float::after {
+    content: '♬';
+    bottom: 6%;
+    left: 8%;
+    animation-delay: 1s;
+}
+
+.card-hover {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card-hover:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 20px 40px rgba(109, 40, 217, 0.14);
+}
+
+.custom-scrollbar::-webkit-scrollbar,
+body::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb,
+body::-webkit-scrollbar-thumb {
+    border-radius: 999px;
+    background: linear-gradient(180deg, #7c3aed, #5b21b6);
+}
+
+.custom-scrollbar::-webkit-scrollbar-track,
+body::-webkit-scrollbar-track {
+    background: #ede9fe;
+}
+
+.pulse-dot {
+    position: relative;
+}
+
+.pulse-dot::after {
+    content: '';
+    position: absolute;
+    inset: -5px;
+    border-radius: 9999px;
+    border: 2px solid rgba(52, 211, 153, 0.4);
+    animation: ping 1.8s cubic-bezier(0, 0, 0.2, 1) infinite;
+}
+
+.stat-counter {
+    counter-reset: stat;
+}
+
+.fade-in-up {
+    animation: fadeUp 0.7s ease both;
+}
+
+@keyframes floatNote {
+    0%,
+    100% { transform: translateY(0px) rotate(0deg); }
+    50% { transform: translateY(-14px) rotate(10deg); }
+}
+
+@keyframes fadeUp {
+    from { opacity: 0; transform: translateY(14px); }
+    to { opacity: 1; transform: translateY(0); }
+}
